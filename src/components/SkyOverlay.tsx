@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, Animated } from 'react-native';
 import Svg, { Line } from 'react-native-svg';
 import { SkyObject, DeviceOrientation, Constellation } from '../types/astronomy';
 import { projectToScreen, matrixFromAltAz } from '../astronomy/projection';
@@ -26,6 +26,28 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const M = orientation.matrix ?? matrixFromAltAz(orientation.altitude, orientation.azimuth);
 
+  // Pulsing animation for star proximity click hint
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.25,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1.0,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    pulseLoop.start();
+    return () => pulseLoop.stop();
+  }, [pulseAnim]);
+
   const project = (az: number, alt: number) =>
     projectToScreen(alt, az, M, verticalFov, screenWidth, screenHeight);
 
@@ -36,11 +58,29 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
     return p;
   };
 
+  // Screen center coordinates (where the camera pointer/crosshair points)
+  const centerX = screenWidth / 2;
+  const centerY = screenHeight / 2;
+  const PROXIMITY_THRESHOLD_PX = 95; // Near the center pointer
+
   // for constellation lines: NO clipping, only "in front of camera"
   const objectCoordsMap = new Map<string, { x: number; y: number }>();
+  let nearestStarToCenter: { obj: SkyObject; dist: number } | null = null;
+
   objects.forEach((obj) => {
     const p = project(obj.azimuth, obj.altitude);
-    if (p) objectCoordsMap.set(obj.id, { x: p.x, y: p.y });
+    if (p) {
+      objectCoordsMap.set(obj.id, { x: p.x, y: p.y });
+      // Calculate distance to camera pointer / center
+      const dx = p.x - centerX;
+      const dy = p.y - centerY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < PROXIMITY_THRESHOLD_PX) {
+        if (!nearestStarToCenter || dist < nearestStarToCenter.dist) {
+          nearestStarToCenter = { obj, dist };
+        }
+      }
+    }
   });
 
   return (
@@ -92,6 +132,8 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
             ? '#90E0EF'
             : '#FFFFFF';
 
+        const isNearCenter = nearestStarToCenter?.obj.id === obj.id;
+
         return (
           <TouchableOpacity
             key={obj.id}
@@ -105,6 +147,18 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
               },
             ]}
           >
+            {/* Animated pulsing click target ring when near camera center pointer */}
+            {isNearCenter && (
+              <Animated.View
+                style={[
+                  styles.proximityTargetRing,
+                  {
+                    transform: [{ scale: pulseAnim }],
+                  },
+                ]}
+              />
+            )}
+
             {/* Pulsing ring for mission targets */}
             {isMissionTarget && <View style={styles.missionTargetRing} />}
 
@@ -122,6 +176,7 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
                   shadowRadius: isMoon ? 16 : 10,
                   elevation: 10,
                 },
+                isNearCenter && styles.nearCenterDot,
               ]}
             >
               <Text style={[styles.starGlyph, isMoon && { fontSize: 18 }]}>
@@ -129,12 +184,13 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
               </Text>
             </View>
 
-            {/* Star Label */}
+            {/* Star Label & Click Prompt */}
             <View
               style={[
                 styles.labelBubble,
                 isSelected && styles.selectedBubble,
                 isMissionTarget && styles.missionBubble,
+                isNearCenter && styles.nearCenterBubble,
               ]}
             >
               <Text style={[styles.labelText, isMissionTarget && styles.missionLabelText]}>
@@ -142,6 +198,11 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
               </Text>
               {obj.constellationName && (
                 <Text style={styles.subLabelText}>{obj.constellationName}</Text>
+              )}
+              {isNearCenter && !isSelected && (
+                <View style={styles.clickHintBadge}>
+                  <Text style={styles.clickHintText}>👆 Tap to inspect</Text>
+                </View>
               )}
               {isSelected && (
                 <Text style={styles.tapToAskText}>💬 Tap to Ask AI</Text>
@@ -154,11 +215,42 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
         );
       })}
 
-      {/* 3. Subtle Camera Reticle In Center */}
-      <View style={styles.centerReticle} pointerEvents="none">
-        <View style={styles.reticleCrosshairH} />
-        <View style={styles.reticleCrosshairV} />
-        <View style={styles.reticleCenterDot} />
+      {/* 3. Camera Reticle In Center with locked state */}
+      <View
+        style={[
+          styles.centerReticle,
+          nearestStarToCenter && styles.centerReticleLocked,
+        ]}
+        pointerEvents="none"
+      >
+        <View
+          style={[
+            styles.reticleCrosshairH,
+            nearestStarToCenter && styles.reticleLockedColor,
+          ]}
+        />
+        <View
+          style={[
+            styles.reticleCrosshairV,
+            nearestStarToCenter && styles.reticleLockedColor,
+          ]}
+        />
+        <View
+          style={[
+            styles.reticleCenterDot,
+            nearestStarToCenter && styles.reticleDotLocked,
+          ]}
+        />
+        {nearestStarToCenter && (
+          <Animated.View
+            style={[
+              styles.reticleLockRing,
+              {
+                transform: [{ scale: pulseAnim }],
+              },
+            ]}
+          />
+        )}
       </View>
     </View>
   );
@@ -262,5 +354,67 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     backgroundColor: '#38BDF8',
+  },
+  proximityTargetRing: {
+    position: 'absolute',
+    top: -12,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: '#38BDF8',
+    backgroundColor: 'rgba(56, 189, 248, 0.15)',
+    shadowColor: '#38BDF8',
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 12,
+  },
+  nearCenterDot: {
+    borderWidth: 1.5,
+    borderColor: '#38BDF8',
+  },
+  nearCenterBubble: {
+    borderColor: '#38BDF8',
+    backgroundColor: 'rgba(15, 23, 42, 0.92)',
+    shadowColor: '#38BDF8',
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  clickHintBadge: {
+    backgroundColor: '#0284C7',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginTop: 3,
+  },
+  clickHintText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+  },
+  centerReticleLocked: {
+    transform: [{ scale: 1.15 }],
+  },
+  reticleLockedColor: {
+    backgroundColor: '#38BDF8',
+  },
+  reticleDotLocked: {
+    backgroundColor: '#38BDF8',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    shadowColor: '#38BDF8',
+    shadowOpacity: 1,
+    shadowRadius: 8,
+  },
+  reticleLockRing: {
+    position: 'absolute',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 1.5,
+    borderColor: '#38BDF8',
   },
 });

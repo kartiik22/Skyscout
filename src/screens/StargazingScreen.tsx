@@ -263,47 +263,49 @@ export const StargazingScreen: React.FC<StargazingScreenProps> = ({
         </TouchableOpacity>
       )}
 
-      {/* BOTTOM ACTION BAR */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity
-          style={styles.hudBtn}
-          onPress={() => onToggleDebug(!debugMode)}
-        >
-          <Text style={styles.hudBtnText}>🛰️ HUD</Text>
-        </TouchableOpacity>
+      {/* BOTTOM ACTION BAR - Hidden when star description card is open */}
+      {!selectedObject && (
+        <View style={styles.bottomBar}>
+          <TouchableOpacity
+            style={styles.hudBtn}
+            onPress={() => onToggleDebug(!debugMode)}
+          >
+            <Text style={styles.hudBtnText}>🛰️ HUD</Text>
+          </TouchableOpacity>
 
-        {/* Local AI Scanning Button */}
-        <TouchableOpacity
-          style={styles.aiScanBtn}
-          activeOpacity={0.8}
-          onPress={handleTriggerAiScan}
-          disabled={isAiScanning}
-        >
-          {isAiScanning ? (
-            <ActivityIndicator color="#FFFFFF" size="small" />
-          ) : (
-            <Text style={styles.aiScanText}>✨ Edge AI Identify</Text>
-          )}
-        </TouchableOpacity>
+          {/* Local AI Scanning Button */}
+          <TouchableOpacity
+            style={styles.aiScanBtn}
+            activeOpacity={0.8}
+            onPress={handleTriggerAiScan}
+            disabled={isAiScanning}
+          >
+            {isAiScanning ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={styles.aiScanText}>✨ Edge AI Identify</Text>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.hudBtn}
-          onPress={() => {
-            HapticsService.triggerClick();
-            setChatModalVisible(true);
-          }}
-        >
-          <Text style={styles.hudBtnText}>💬 Chat</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.hudBtn}
+            onPress={() => {
+              HapticsService.triggerClick();
+              setChatModalVisible(true);
+            }}
+          >
+            <Text style={styles.hudBtnText}>💬 Chat</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.hudBtn} onPress={onOpenMissions}>
-          <Text style={styles.hudBtnText}>🌱 Missions</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.hudBtn} onPress={onOpenMissions}>
+            <Text style={styles.hudBtnText}>🌱 Missions</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.hudBtn} onPress={onOpenSettings}>
-          <Text style={styles.hudBtnText}>⚙️</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.hudBtn} onPress={onOpenSettings}>
+            <Text style={styles.hudBtnText}>⚙️</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* OBJECT INFO BOTTOM SHEET */}
       <ObjectInfoSheet
@@ -468,10 +470,10 @@ const styles = StyleSheet.create({
   },
   activeMissionBar: {
     position: 'absolute',
-    top: 100,
+    top: 96,
     left: 16,
     right: 16,
-    backgroundColor: 'rgba(6, 78, 59, 0.92)',
+    backgroundColor: 'rgba(6, 78, 59, 0.94)',
     borderRadius: 14,
     padding: 12,
     flexDirection: 'row',
@@ -506,12 +508,12 @@ const styles = StyleSheet.create({
   },
   aiResultBanner: {
     position: 'absolute',
-    bottom: 90,
+    top: 156,
     left: 16,
     right: 16,
     backgroundColor: 'rgba(15, 23, 42, 0.95)',
     borderRadius: 14,
-    padding: 14,
+    padding: 12,
     borderWidth: 1,
     borderColor: '#38BDF8',
     zIndex: 20,
@@ -532,12 +534,12 @@ const styles = StyleSheet.create({
     color: '#38BDF8',
     fontSize: 12,
     fontWeight: '800',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   aiResultBody: {
     color: '#E2E8F0',
     fontSize: 12,
-    lineHeight: 17,
+    lineHeight: 16,
   },
   aiClose: {
     position: 'absolute',
@@ -552,34 +554,36 @@ const styles = StyleSheet.create({
   bottomBar: {
     position: 'absolute',
     bottom: 24,
-    left: 16,
-    right: 16,
+    left: 12,
+    right: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 6,
     zIndex: 10,
   },
   hudBtn: {
-    backgroundColor: 'rgba(15, 23, 42, 0.85)',
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderRadius: 14,
+    backgroundColor: 'rgba(15, 23, 42, 0.88)',
+    paddingHorizontal: 9,
+    paddingVertical: 11,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
+    minWidth: 42,
   },
   hudBtnText: {
     color: '#F8FAFC',
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 11,
   },
   aiScanBtn: {
-    flex: 1,
-    marginHorizontal: 10,
+    flex: 1.2,
     backgroundColor: '#0284C7',
-    paddingVertical: 13,
-    borderRadius: 16,
+    paddingVertical: 11,
+    paddingHorizontal: 8,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#38BDF8',
@@ -590,7 +594,7 @@ const styles = StyleSheet.create({
   aiScanText: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 14,
-    letterSpacing: 0.3,
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
 });

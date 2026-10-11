@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 20,
     elevation: 25,
+    zIndex: 50,
   },
   grabber: {
     width: 44,
