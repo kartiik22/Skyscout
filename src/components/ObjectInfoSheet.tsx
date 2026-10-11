@@ -7,12 +7,14 @@ interface ObjectInfoSheetProps {
   object: SkyObject | null;
   onClose: () => void;
   onStartMission?: (obj: SkyObject) => void;
+  onOpenChat?: (obj: SkyObject) => void;
 }
 
 export const ObjectInfoSheet: React.FC<ObjectInfoSheetProps> = ({
   object,
   onClose,
   onStartMission,
+  onOpenChat,
 }) => {
   if (!object) return null;
 
@@ -94,16 +96,32 @@ export const ObjectInfoSheet: React.FC<ObjectInfoSheetProps> = ({
           <Text style={styles.touchGrassSubtitle}>
             Find {object.name} with your own eyes. Put your phone down and look toward the {Math.round(object.altitude)}° elevation mark in the sky.
           </Text>
+        </View>
+
+        {/* Action Buttons: Ask AI & Touch Grass Mission */}
+        <View style={styles.actionRow}>
+          {onOpenChat && (
+            <TouchableOpacity
+              style={styles.chatActionBtn}
+              activeOpacity={0.8}
+              onPress={() => {
+                HapticsService.triggerClick();
+                onOpenChat(object);
+              }}
+            >
+              <Text style={styles.chatActionIcon}>💬</Text>
+              <Text style={styles.chatActionText}>Ask AI Astronomer</Text>
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
-            style={styles.missionActionBtn}
+            style={[styles.missionActionBtn, onOpenChat && { flex: 1 }]}
             activeOpacity={0.8}
             onPress={handleStartMission}
           >
             <Text style={styles.missionActionText}>Track with Haptic Guide</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={{ height: 28 }} />
       </ScrollView>
     </View>
   );
@@ -266,15 +284,50 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 12,
   },
-  missionActionBtn: {
-    backgroundColor: '#059669',
-    borderRadius: 10,
-    paddingVertical: 10,
+  actionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 14,
+    marginBottom: 32,
+  },
+  chatActionBtn: {
+    flex: 1.1,
+    flexDirection: 'row',
+    backgroundColor: '#0284C7',
+    borderRadius: 14,
+    paddingVertical: 12,
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#38BDF8',
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(56, 189, 248, 0.4)',
+  },
+  chatActionIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  chatActionText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 13,
+    letterSpacing: 0.2,
+  },
+  missionActionBtn: {
+    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(52, 211, 153, 0.4)',
   },
   missionActionText: {
-    color: '#FFFFFF',
+    color: '#6EE7B7',
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: 12,
   },
 });

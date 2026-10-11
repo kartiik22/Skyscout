@@ -9,6 +9,12 @@ import { HowItWorksScreen } from './src/screens/HowItWorksScreen';
 import { CalibrationModal } from './src/components/CalibrationModal';
 import { SensorFusion } from './src/sensors/SensorFusion';
 import { TouchGrassMission } from './src/types/astronomy';
+import { AIChatService } from './src/ai/AIChatService';
+
+// Initialize AIChatService with API key if defined in environment
+if (typeof process !== 'undefined' && process.env?.APIKEY) {
+  AIChatService.setApiKey(process.env.APIKEY);
+}
 
 type AppScreen = 'home' | 'stargazing';
 

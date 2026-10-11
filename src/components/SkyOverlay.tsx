@@ -143,6 +143,9 @@ export const SkyOverlay: React.FC<SkyOverlayProps> = ({
               {obj.constellationName && (
                 <Text style={styles.subLabelText}>{obj.constellationName}</Text>
               )}
+              {isSelected && (
+                <Text style={styles.tapToAskText}>💬 Tap to Ask AI</Text>
+              )}
             </View>
 
             {/* Delicate Connecting Line */}
@@ -208,6 +211,12 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     fontSize: 9,
     fontWeight: '500',
+  },
+  tapToAskText: {
+    color: '#BAE6FD',
+    fontSize: 9,
+    fontWeight: '700',
+    marginTop: 2,
   },
   connectingLine: {
     width: 28,

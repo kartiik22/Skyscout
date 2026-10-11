@@ -61,6 +61,20 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           </TouchableOpacity>
         </View>
 
+        {/* AI Astronomer Chatbot Status */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>AI CELESTIAL ASSISTANT</Text>
+          <View style={styles.aiStatusCard}>
+            <View style={styles.aiStatusHeader}>
+              <Text style={styles.aiStatusIcon}>✨</Text>
+              <Text style={styles.itemTitle}>Interactive Star Chatbot</Text>
+            </View>
+            <Text style={styles.itemSubtitle}>
+              Tap any star in the sky view to open the AI Astronomer chat window. Supports OpenRouter LLM live inference with automatic offline astronomical lore fallback.
+            </Text>
+          </View>
+        </View>
+
         {/* Sky Filter Thresholds */}
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>SKY VISIBILITY THRESHOLD</Text>
@@ -179,6 +193,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  aiStatusCard: {
+    backgroundColor: 'rgba(30, 41, 59, 0.5)',
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(56, 189, 248, 0.2)',
+  },
+  aiStatusHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  aiStatusIcon: {
+    fontSize: 16,
+    marginRight: 6,
   },
   arrowText: {
     color: '#38BDF8',

@@ -18,6 +18,7 @@ import { CompassIndicator } from '../components/CompassIndicator';
 import { ObjectInfoSheet } from '../components/ObjectInfoSheet';
 import { DebugOverlay } from '../components/DebugOverlay';
 import { CalibrationModal } from '../components/CalibrationModal';
+import { StarChatModal } from '../components/StarChatModal';
 import { HapticsService } from '../sensors/HapticsService';
 import { angularDistanceDeg } from '../astronomy/CoordinateTransform';
 import { SkyObject, TouchGrassMission, DeviceOrientation, ObserverLocation } from '../types/astronomy';
@@ -64,6 +65,7 @@ export const StargazingScreen: React.FC<StargazingScreenProps> = ({
   // 4. Object selection & UI modals
   const [selectedObject, setSelectedObject] = useState<SkyObject | null>(null);
   const [calibrationVisible, setCalibrationVisible] = useState(false);
+  const [chatModalVisible, setChatModalVisible] = useState(false);
   const [isAiScanning, setIsAiScanning] = useState(false);
   const [aiResultText, setAiResultText] = useState<string | null>(null);
 
@@ -96,7 +98,7 @@ export const StargazingScreen: React.FC<StargazingScreenProps> = ({
     }
   }, [cameraPermission]);
 
-  // Trigger Local AI Identification
+  // Trigger Local AI Identification & Open Chatbot
   const handleTriggerAiScan = async () => {
     HapticsService.triggerClick();
     setIsAiScanning(true);
@@ -110,13 +112,26 @@ export const StargazingScreen: React.FC<StargazingScreenProps> = ({
         candidateObjects: visibleStars,
       });
 
+      let targetStar = selectedObject;
       if (res.matchedObjectId) {
         const found = visibleStars.find((o) => o.id === res.matchedObjectId);
-        if (found) setSelectedObject(found);
+        if (found) {
+          targetStar = found;
+          setSelectedObject(found);
+        }
+      } else if (!targetStar && visibleStars.length > 0) {
+        // Fallback to the brightest or nearest visible star
+        targetStar = visibleStars[0];
+        setSelectedObject(targetStar);
       }
 
       setAiResultText(`${res.provider} (${res.latencyMs}ms): ${res.description}`);
       HapticsService.triggerSuccess();
+
+      // Automatically launch the interactive AI Astronomer Chatbot window!
+      setTimeout(() => {
+        setChatModalVisible(true);
+      }, 400);
     } catch {
       Alert.alert('AI Analysis', 'Unable to resolve optical boresight.');
     } finally {
@@ -168,7 +183,12 @@ export const StargazingScreen: React.FC<StargazingScreenProps> = ({
         targetMissionObjectId={activeMission?.targetObjectId}
         onSelectObject={(obj) => {
           HapticsService.triggerClick();
-          setSelectedObject(obj);
+          if (selectedObject?.id === obj.id) {
+            // Tapping selected star again opens the AI chat immediately
+            setChatModalVisible(true);
+          } else {
+            setSelectedObject(obj);
+          }
         }}
       />
 
@@ -216,15 +236,31 @@ export const StargazingScreen: React.FC<StargazingScreenProps> = ({
 
       {/* AI SCAN BANNER NOTIFICATION */}
       {aiResultText && (
-        <View style={styles.aiResultBanner}>
-          <Text style={styles.aiResultTitle}>🤖 Open-Weight Edge Astrometry Match</Text>
+        <TouchableOpacity
+          style={styles.aiResultBanner}
+          activeOpacity={0.9}
+          onPress={() => {
+            HapticsService.triggerClick();
+            setChatModalVisible(true);
+          }}
+        >
+          <View style={styles.aiResultHeaderRow}>
+            <Text style={styles.aiResultTitle}>🤖 Open-Weight Edge Astrometry Match</Text>
+            <Text style={styles.aiResultTapHint}>Tap to chat 💬</Text>
+          </View>
           <Text style={styles.aiResultBody} numberOfLines={3}>
             {aiResultText}
           </Text>
-          <TouchableOpacity onPress={() => setAiResultText(null)} style={styles.aiClose}>
+          <TouchableOpacity
+            onPress={(e) => {
+              e.stopPropagation();
+              setAiResultText(null);
+            }}
+            style={styles.aiClose}
+          >
             <Text style={styles.aiCloseText}>✕</Text>
           </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
       )}
 
       {/* BOTTOM ACTION BAR */}
@@ -250,6 +286,16 @@ export const StargazingScreen: React.FC<StargazingScreenProps> = ({
           )}
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.hudBtn}
+          onPress={() => {
+            HapticsService.triggerClick();
+            setChatModalVisible(true);
+          }}
+        >
+          <Text style={styles.hudBtnText}>💬 Chat</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.hudBtn} onPress={onOpenMissions}>
           <Text style={styles.hudBtnText}>🌱 Missions</Text>
         </TouchableOpacity>
@@ -263,10 +309,22 @@ export const StargazingScreen: React.FC<StargazingScreenProps> = ({
       <ObjectInfoSheet
         object={selectedObject}
         onClose={() => setSelectedObject(null)}
+        onOpenChat={(obj) => {
+          setSelectedObject(obj);
+          setChatModalVisible(true);
+        }}
         onStartMission={(obj) => {
           setSelectedObject(null);
           onOpenMissions();
         }}
+      />
+
+      {/* STAR AI CHATBOT MODAL */}
+      <StarChatModal
+        visible={chatModalVisible}
+        onClose={() => setChatModalVisible(false)}
+        targetObject={selectedObject}
+        location={location}
       />
 
       {/* DEVELOPER DEBUG HUD */}
@@ -457,6 +515,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#38BDF8',
     zIndex: 20,
+  },
+  aiResultHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 24,
+    marginBottom: 4,
+  },
+  aiResultTapHint: {
+    color: '#38BDF8',
+    fontSize: 10,
+    fontWeight: '700',
   },
   aiResultTitle: {
     color: '#38BDF8',
