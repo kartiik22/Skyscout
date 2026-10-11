@@ -44,6 +44,56 @@ Check out the full open-source repository on GitHub:
 
 ---
 
+## System Architecture
+
+```mermaid
+graph TD
+    subgraph Mobile Hardware Layer
+        CAM[Phone Camera Viewport]
+        GPS[GPS Chip - expo-location]
+        IMU[Gyroscope & Magnetometer - expo-sensors]
+        HAP[Haptics Engine - expo-haptics]
+    end
+
+    subgraph Astrodynamics & Fusion Core
+        LOC[LocationService: Lat/Long/Alt]
+        FUS[SensorFusion: 60Hz Rotation Matrix]
+        ENG[AstronomyEngine: J2000 Precession & Ephemeris]
+        PROJ[Projection Engine: 3D Alt/Az to 2D Camera Pixels]
+    end
+
+    subgraph Interactive AR Experience
+        OVERLAY[AR SkyOverlay: Constellations & Stars]
+        RETICLE[Camera Pointer: Live Proximity Detection]
+        CARD[Celestial Card & Hero Action Interface]
+        MISSION[Touch Grass Haptic Guide & Outdoor Tracker]
+    end
+
+    subgraph Open-Source AI Intelligence
+        CTX[Live Astronomical Context Ingestion]
+        MODELS[Open-Weight AI Cascade: Gemma 2 9B/27B & Llama 3.3 70B]
+        CHAT[SkyScout Celestial Guide Dialogue]
+    end
+
+    GPS --> LOC --> ENG
+    IMU --> FUS --> PROJ
+    CAM --> OVERLAY
+    ENG --> PROJ --> OVERLAY
+    OVERLAY --> RETICLE
+    RETICLE -->|Point & Tap| CARD
+    CARD -->|Trigger| CTX
+    CTX --> MODELS --> CHAT
+    CARD -->|Start Mission| MISSION --> HAP
+```
+
+### Architectural Breakdown:
+1. **Hardware & Sensor Fusion Layer**: Polls the device's 3-axis gyroscope, magnetometer, and accelerometer at 60Hz. It converts raw orientation angles into a continuous 3D rotation matrix (`M`), eliminating gimbal lock and jitter while pointing toward zenith.
+2. **Astrodynamics Computation**: `AstronomyEngine` converts catalog Right Ascension & Declination coordinates $(\alpha, \delta)$ into the observer's local horizontal coordinates $(Alt, Az)$ in real time using the device's live GPS coordinates and local sidereal time.
+3. **Viewport Projection**: Projects spherical coordinates onto the 2D plane of the phone screen using pinhole camera intrinsic optics, calculating field-of-view (FOV) clipping and constellation bounding vectors.
+4. **Context-Aware Open AI Ingestion**: When the camera reticle locks onto a star, the app extracts the celestial object's real-time telemetry (exact altitude, azimuth, magnitude, constellation, and distance) and feeds it dynamically into open-weight models (`google/gemma-2-9b-it`, `meta-llama/llama-3.3-70b-instruct`) for instant, scientifically accurate celestial guidance.
+
+---
+
 ## How I Built It
 
 ### 1. Dynamic GPS & Real-Time Ephemeris
