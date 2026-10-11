@@ -47,6 +47,29 @@ export const ObjectInfoSheet: React.FC<ObjectInfoSheetProps> = ({
         </TouchableOpacity>
       </View>
 
+      {/* BIG HERO BUTTON: ASK AI ASTRONOMER AT THE TOP */}
+      {onOpenChat && (
+        <TouchableOpacity
+          style={styles.heroChatActionBtn}
+          activeOpacity={0.85}
+          onPress={() => {
+            HapticsService.triggerClick();
+            onOpenChat(object);
+          }}
+        >
+          <View style={styles.heroChatIconBox}>
+            <Text style={styles.heroChatIcon}>✨</Text>
+          </View>
+          <View style={styles.heroChatTextBox}>
+            <Text style={styles.heroChatTitle}>Ask AI Astronomer</Text>
+            <Text style={styles.heroChatSubtitle}>
+              Chat live about {object.name}'s mythology, distance & lore
+            </Text>
+          </View>
+          <Text style={styles.heroChatChevron}>›</Text>
+        </TouchableOpacity>
+      )}
+
       <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Metric Badges */}
         <View style={styles.metricGrid}>
@@ -96,30 +119,12 @@ export const ObjectInfoSheet: React.FC<ObjectInfoSheetProps> = ({
           <Text style={styles.touchGrassSubtitle}>
             Find {object.name} with your own eyes. Put your phone down and look toward the {Math.round(object.altitude)}° elevation mark in the sky.
           </Text>
-        </View>
-
-        {/* Action Buttons: Ask AI & Touch Grass Mission */}
-        <View style={styles.actionRow}>
-          {onOpenChat && (
-            <TouchableOpacity
-              style={styles.chatActionBtn}
-              activeOpacity={0.8}
-              onPress={() => {
-                HapticsService.triggerClick();
-                onOpenChat(object);
-              }}
-            >
-              <Text style={styles.chatActionIcon}>💬</Text>
-              <Text style={styles.chatActionText}>Ask AI Astronomer</Text>
-            </TouchableOpacity>
-          )}
-
           <TouchableOpacity
-            style={[styles.missionActionBtn, onOpenChat && { flex: 1 }]}
+            style={styles.missionActionBtn}
             activeOpacity={0.8}
             onPress={handleStartMission}
           >
-            <Text style={styles.missionActionText}>Track with Haptic Guide</Text>
+            <Text style={styles.missionActionText}>🎯 Track with Haptic Guide</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -317,18 +322,66 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   missionActionBtn: {
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+    backgroundColor: 'rgba(16, 185, 129, 0.25)',
     borderRadius: 14,
     paddingVertical: 12,
-    paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(52, 211, 153, 0.4)',
+    marginTop: 4,
   },
   missionActionText: {
     color: '#6EE7B7',
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 13,
+  },
+  heroChatActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0284C7',
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    borderWidth: 1.5,
+    borderColor: '#38BDF8',
+    shadowColor: '#38BDF8',
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  heroChatIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  heroChatIcon: {
+    fontSize: 18,
+  },
+  heroChatTextBox: {
+    flex: 1,
+  },
+  heroChatTitle: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 15,
+    letterSpacing: 0.3,
+  },
+  heroChatSubtitle: {
+    color: '#E0F2FE',
+    fontSize: 11,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  heroChatChevron: {
+    color: '#BAE6FD',
+    fontSize: 22,
+    fontWeight: '300',
+    marginLeft: 6,
   },
 });
