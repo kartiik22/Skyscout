@@ -23,6 +23,13 @@ Instead of keeping your face glued to indoor screens or feeds, SkyScout turns yo
 
 - **Live Deployed App (Expo)**: [https://expo.dev/accounts/kartiik22/projects/sky/updates/19ba1ee0-e700-4b34-af2b-5e5a59b828dd](https://expo.dev/accounts/kartiik22/projects/sky/updates/19ba1ee0-e700-4b34-af2b-5e5a59b828dd)
 
+> **📱 How to Run on Your Phone via Expo Go:**
+> 1. Open the link above.
+> 2. Click on the **Hero button update** (`preview`) update entry.
+> 3. Click the **QR icon** next to the update to display the QR code.
+> 4. Scan the QR code using your phone's camera (iOS) or the Expo Go scanner (Android) to open the app directly in **Expo Go** *(make sure you have the free [Expo Go](https://expo.dev/go) app installed on your device)*.
+> 5. **Allow camera, location, and motion/physical activity permissions** when prompted so the app can detect your live GPS horizon and overlay stars through your camera feed using sensor fusion.
+
 ---
 
 ## Code
