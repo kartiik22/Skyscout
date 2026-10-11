@@ -35,7 +35,7 @@ Instead of keeping your face glued to indoor screens or feeds, SkyScout turns yo
 
 Check out the full open-source repository on GitHub:
 
-{% github kartiik22/Stargazing %}
+{% github kartiik22/SkyScout %}
 
 - **Architecture**: React Native + Expo SDK 57 + TypeScript
 - **Sensors & Projection**: `expo-camera`, `expo-sensors`, `expo-location`, `expo-haptics`
