@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SkyScout",
-    "slug": "skyscout",
+    "slug": "sky",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -9,12 +9,15 @@
     "backgroundColor": "#050714",
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.kartiik.skyscout",
       "infoPlist": {
         "NSCameraUsageDescription": "SkyScout needs camera access to overlay celestial stars and constellations onto the night sky.",
-        "NSLocationWhenInUseUsageDescription": "SkyScout requires your location to calculate which stars and planets are visible from your position."
+        "NSLocationWhenInUseUsageDescription": "SkyScout requires your location to calculate which stars and planets are visible from your position.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
+      "package": "com.kartiik.skyscout",
       "adaptiveIcon": {
         "backgroundColor": "#050714",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -24,12 +27,26 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION"
       ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bd9a8756-f370-41a9-aad6-faefc41e82f1"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bd9a8756-f370-41a9-aad6-faefc41e82f1"
     }
   }
 }
