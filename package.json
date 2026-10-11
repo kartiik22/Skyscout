@@ -15,9 +15,12 @@
     "expo-status-bar": "~57.0.1",
     "expo-updates": "~57.0.25",
     "lucide-react-native": "^1.52.0",
+    "pngjs": "^7.0.0",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.86.3",
     "react-native-svg": "^15.15.4",
+    "react-native-web": "^0.21.2",
     "source-map": "^0.5.7",
     "stream-buffers": "^3.0.3"
   },
