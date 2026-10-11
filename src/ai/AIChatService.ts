@@ -130,9 +130,9 @@ Keep answers engaging, conversational, concise (2-4 paragraphs maximum), and enc
     }
 
     const candidateModels = [
-      'google/gemini-2.0-flash-exp:free',
-      'google/gemini-flash-1.5',
+      'google/gemma-2-9b-it:free',
       'meta-llama/llama-3.3-70b-instruct:free',
+      'google/gemma-2-27b-it',
       'openrouter/auto',
     ];
 
