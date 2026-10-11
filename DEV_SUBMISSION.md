@@ -35,9 +35,9 @@ Instead of keeping your face glued to indoor screens or feeds, SkyScout turns yo
 
 Check out the full open-source repository on GitHub:
 
-{% github kartiik22/Stargazing %}
+{% github kartiik22/SkyScout %}
 
-- **GitHub Repository**: [https://github.com/kartiik22/Stargazing](https://github.com/kartiik22/Stargazing)
+- **GitHub Repository**: [https://github.com/kartiik22/SkyScout](https://github.com/kartiik22/SkyScout)
 - **Architecture**: React Native + Expo SDK 57 + TypeScript
 - **Sensors & Projection**: `expo-camera`, `expo-sensors`, `expo-location`, `expo-haptics`
 - **Astronomy Math**: `astronomy-engine` for dynamic ephemeris, coordinate transforms, and J2000 epoch precession.
@@ -55,7 +55,7 @@ Using high-frequency 60Hz rotation matrices mapped from your phone's gyroscope a
 When your camera reticle sweeps close to a star, a proximity algorithm detects the target, pulses an animated target ring, and illuminates the star’s label with `👆 Tap to inspect`, letting the user know they can lock in and chat with the AI.
 
 ### 3. Real-Time AI Insights via Open-Source AI
-SkyScout routes queries to open-weight models (`meta-llama/llama-3.3-70b-instruct`, `google/gemini-flash-1.5`, and `openrouter/auto`):
+SkyScout routes queries exclusively to open-weight models (`google/gemma-2-9b-it`, `meta-llama/llama-3.3-70b-instruct`, and `google/gemma-2-27b-it`):
 - **Live Context Injection**: Every time a user opens the chat by pointing at a star, the system automatically injects that star’s real-time physical properties into the AI prompt:
   - Exact apparent visual magnitude (brightness)
   - Light-year distance from Earth
